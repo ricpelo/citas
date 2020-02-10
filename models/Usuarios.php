@@ -3,18 +3,19 @@
 namespace app\models;
 
 use Yii;
+use yii\web\IdentityInterface;
 
 /**
  * This is the model class for table "usuarios".
  *
  * @property int $id
  * @property string $nombre
+ * @property string $email
  * @property string $password
- * @property string $auth_key
- * @property string $telefono
- * @property string $poblacion
+ *
+ * @property Citas[] $citas
  */
-class Usuarios extends \yii\db\ActiveRecord
+class Usuarios extends \yii\db\ActiveRecord implements IdentityInterface
 {
     /**
      * {@inheritdoc}
@@ -30,9 +31,11 @@ class Usuarios extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['nombre', 'password'], 'required'],
-            [['nombre', 'auth_key', 'telefono', 'poblacion'], 'string', 'max' => 255],
+            [['nombre', 'email', 'password'], 'required'],
+            [['nombre', 'email'], 'string', 'max' => 255],
             [['password'], 'string', 'max' => 60],
+            [['email'], 'unique'],
+            [['nombre'], 'unique'],
         ];
     }
 
@@ -44,10 +47,43 @@ class Usuarios extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'nombre' => 'Nombre',
+            'email' => 'Email',
             'password' => 'Password',
-            'auth_key' => 'Auth Key',
-            'telefono' => 'Teléfono',
-            'poblacion' => 'Población',
         ];
+    }
+
+    public static function findIdentity($id)
+    {
+        return static::findOne($id);
+    }
+
+    public static function findIdentityByAccessToken($token, $type = null)
+    {
+    }
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function getAuthKey()
+    {
+    }
+
+    public function validateAuthKey($authKey)
+    {
+    }
+
+    public function validatePassword($password)
+    {
+        return Yii::$app->security->validatePassword($password, $this->password);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCitas()
+    {
+        return $this->hasMany(Citas::className(), ['usuario_id' => 'id'])->inverseOf('usuario');
     }
 }
