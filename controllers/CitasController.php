@@ -7,6 +7,7 @@ use app\models\Citas;
 use app\models\CitasSearch;
 use app\models\Especialidades;
 use app\models\Especialistas;
+use yii\bootstrap4\ActiveForm;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -77,7 +78,12 @@ class CitasController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Citas();
+        $model = new Citas(['usuario_id' => Yii::$app->user->id]);
+
+        if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return ActiveForm::validate($model);
+        }
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);

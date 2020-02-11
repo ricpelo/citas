@@ -86,4 +86,12 @@ class Usuarios extends \yii\db\ActiveRecord implements IdentityInterface
     {
         return $this->hasMany(Citas::className(), ['usuario_id' => 'id'])->inverseOf('usuario');
     }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCitasPendientes()
+    {
+        return $this->getCitas()->andOnCondition('instante >= localtimestamp');
+    }
 }

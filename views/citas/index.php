@@ -1,5 +1,6 @@
 <?php
 
+use kartik\datetime\DateTimePicker;
 use yii\bootstrap4\Html;
 use yii\grid\GridView;
 
@@ -9,6 +10,9 @@ use yii\grid\GridView;
 
 $this->title = 'Citas';
 $this->params['breadcrumbs'][] = $this->title;
+
+kartik\icons\FontAwesomeAsset::register($this);
+
 ?>
 <div class="citas-index">
 
@@ -26,8 +30,29 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             'usuario.nombre',
             'especialista.nombre',
-            'instante:datetime',
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'attribute' => 'instante',
+                'format' => 'datetime',
+                'filter' => DateTimePicker::widget([
+                    'model' => $searchModel,
+                    'attribute' => 'instante',
+                ])
+            ],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'buttons' => [
+                    'delete' => function ($url, $model, $key) {
+                        return Html::a(
+                            'Anular',
+                            ['citas/delete', 'id' => $key],
+                            [
+                                'data-method' => 'POST',
+                                'data-confirm' => '¿Seguro que desea anular la cita?',
+                            ]
+                        );
+                    },
+                ],
+            ],
         ],
     ]); ?>
 

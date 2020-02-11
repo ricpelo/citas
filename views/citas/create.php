@@ -1,11 +1,13 @@
 <?php
 
+use kartik\datecontrol\DateControl;
 use yii\bootstrap4\ActiveForm;
 use yii\bootstrap4\Html;
 use yii\helpers\Url;
+use yii\web\View;
 
-/* @var $this yii\web\View */
-/* @var $model app\models\Citas */
+/** @var $this yii\web\View */
+/** @var $model app\models\Citas */
 
 $this->title = 'Create Citas';
 $this->params['breadcrumbs'][] = ['label' => 'Citas', 'url' => ['index']];
@@ -37,6 +39,13 @@ $('#citas-especialidad_id').on('change', function (ev) {
 });
 EOT;
 $this->registerJs($js);
+$js = <<<EOT
+$('#citas-create').yiiActiveForm('validateAttribute', 'citas-especialidad_id');
+EOT;
+$this->registerJs($js, View::POS_LOAD);
+
+kartik\icons\FontAwesomeAsset::register($this);
+
 ?>
 <div class="citas-create">
 
@@ -44,11 +53,19 @@ $this->registerJs($js);
 
     <div class="citas-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin([
+        'id' => 'citas-create',
+        'enableAjaxValidation' => true,
+    ]); ?>
 
         <?= $form->field($model, 'especialidad_id')->dropDownList($especialidades) ?>
         <?= $form->field($model, 'especialista_id')->dropDownList($especialistas) ?>
-        <?= $form->field($model, 'instante')->textInput(['readonly' => true]) ?>
+        <?= $form->field($model, 'instante')
+                ->widget(DateControl::classname(), [
+                    'type' => DateControl::FORMAT_DATETIME,
+                    'displayFormat' => 'php:d-m-Y H:i',
+                ]
+            ); ?>
 
         <div class="form-group">
             <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
