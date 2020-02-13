@@ -14,6 +14,7 @@ $this->params['breadcrumbs'][] = ['label' => 'Citas', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 
 $url = Url::to(['citas/especialistas']);
+$urlHueco = Url::to(['citas/hueco']);
 $js = <<<EOT
 $('#citas-especialidad_id').on('change', function (ev) {
     var el = $(this);
@@ -29,12 +30,23 @@ $('#citas-especialidad_id').on('change', function (ev) {
             sel.empty();
             for (var i in data) {
                 sel.append(`<option value="\${i}">\${data[i]}</option>`);
-                // var option = document.createElement('option');
-                // option.value = i;
-                // option.innerHTML = data[i];
-                // sel.append(option);
             }
         }   
+    });
+});
+$('#citas-especialista_id').on('change', function (ev) {
+    var el = $(this);
+    var especialista_id = el.val();
+    $.ajax({
+        method: 'GET',
+        url: '$urlHueco',
+        data: {
+            especialista_id: especialista_id
+        },
+        success: function (data, code, jqXHR) {
+            $('#citas-instante').val(data.formateado);
+            $('#citas-instante-oculto').val(data.valor);
+        }
     });
 });
 EOT;
@@ -43,9 +55,6 @@ $js = <<<EOT
 $('#citas-create').yiiActiveForm('validateAttribute', 'citas-especialidad_id');
 EOT;
 $this->registerJs($js, View::POS_LOAD);
-
-kartik\icons\FontAwesomeAsset::register($this);
-
 ?>
 <div class="citas-create">
 
@@ -60,12 +69,8 @@ kartik\icons\FontAwesomeAsset::register($this);
 
         <?= $form->field($model, 'especialidad_id')->dropDownList($especialidades) ?>
         <?= $form->field($model, 'especialista_id')->dropDownList($especialistas) ?>
-        <?= $form->field($model, 'instante')
-                ->widget(DateControl::classname(), [
-                    'type' => DateControl::FORMAT_DATETIME,
-                    'displayFormat' => 'php:d-m-Y H:i',
-                ]
-            ); ?>
+        <?= Html::activeHiddenInput($model, 'instante', ['id' => 'citas-instante-oculto']) ?>
+        <?= $form->field($model, 'instante')->textInput(['readonly' => true, 'name' => '']) ?>
 
         <div class="form-group">
             <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

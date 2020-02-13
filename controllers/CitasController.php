@@ -7,6 +7,8 @@ use app\models\Citas;
 use app\models\CitasSearch;
 use app\models\Especialidades;
 use app\models\Especialistas;
+use DateInterval;
+use DateTime;
 use yii\bootstrap4\ActiveForm;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -139,6 +141,38 @@ class CitasController extends Controller
         Yii::$app->response->format = Response::FORMAT_JSON;
 
         return Especialistas::lista($especialidad_id);
+    }
+
+    public function actionHueco($especialista_id)
+    {
+        $especialista = Especialistas::findOne($especialista_id);
+        $horaMinima = $especialista->hora_minima;
+        $horaMaxima = $especialista->hora_maxima;
+        $duracion = new DateInterval($especialista->duracion);
+        $ahora = new DateTime();
+        $instante = new DateTime(date('Y-m-d') . ' ' . $horaMinima);
+
+        for (;;) {
+            if ($instante <= $ahora || Citas::find()
+                ->where([
+                    'especialista_id' => $especialista_id,
+                    'instante' => $instante->format('Y-m-d H:i:s'),
+                ])->exists()) {
+                $instante->add($duracion);
+                $maximo = new DateTime($instante->format('Y-m-d') . ' ' . $horaMaxima);
+                if ($instante >= $maximo) {
+                    $instante->add(new DateInterval('P1D'));
+                    $instante = new DateTime($instante->format('Y-m-d') . ' ' . $horaMinima);
+                }
+            } else {
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                return [
+                    'valor' => $instante->format('Y-m-d H:i:s'),
+                    'formateado' => Yii::$app->formatter->asDatetime($instante),
+                ];
+            }
+        }
+
     }
 
     /**
