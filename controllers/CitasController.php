@@ -97,8 +97,8 @@ class CitasController extends Controller
 
         return $this->render('create', [
             'model' => $model,
-            'especialidades' => $especialidades,
-            'especialistas' => $especialistas,
+            'especialidades' => ['' => ''] + $especialidades,
+            'especialistas' => ['' => ''] // , $especialistas),
         ]);
     }
 

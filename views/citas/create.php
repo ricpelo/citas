@@ -19,6 +19,14 @@ $js = <<<EOT
 $('#citas-especialidad_id').on('change', function (ev) {
     var el = $(this);
     var especialidad_id = el.val();
+    if (especialidad_id === '') {
+        $('#citas-especialista_id').empty();
+        $('#citas-especialista_id').append('<option value=""></option>');
+        $('#citas-instante').val('');
+        $('#citas-instante-oculto').val('');
+        // $('#citas-create').yiiActiveForm('validateAttribute', 'citas-especialista_id');
+        return;
+    }
     $.ajax({
         method: 'GET',
         url: '$url',
@@ -31,6 +39,7 @@ $('#citas-especialidad_id').on('change', function (ev) {
             for (var i in data) {
                 sel.append(`<option value="\${i}">\${data[i]}</option>`);
             }
+            $('#citas-especialista_id').trigger('change');
         }   
     });
 });
@@ -46,13 +55,18 @@ $('#citas-especialista_id').on('change', function (ev) {
         success: function (data, code, jqXHR) {
             $('#citas-instante').val(data.formateado);
             $('#citas-instante-oculto').val(data.valor);
+            $('#citas-create').yiiActiveForm('validate');
+            $('#citas-create').yiiActiveForm('validateAttribute', 'citas-especialista_id');
+            $('#citas-create').yiiActiveForm('validateAttribute', 'citas-instante');
         }
     });
 });
 EOT;
 $this->registerJs($js);
 $js = <<<EOT
-$('#citas-create').yiiActiveForm('validateAttribute', 'citas-especialidad_id');
+$('#citas-create').yiiActiveForm('validateAttribute', 'citas-especialista_id');
+$('#citas-especialidad_id').trigger('change');
+
 EOT;
 $this->registerJs($js, View::POS_LOAD);
 ?>
