@@ -21,10 +21,9 @@ $('#citas-especialidad_id').on('change', function (ev) {
     var especialidad_id = el.val();
     if (especialidad_id === '') {
         $('#citas-especialista_id').empty();
-        $('#citas-especialista_id').append('<option value=""></option>');
+        $('#citas-especialista_id').append('<option value=" "></option>');
         $('#citas-instante').val('');
         $('#citas-instante-oculto').val('');
-        // $('#citas-create').yiiActiveForm('validateAttribute', 'citas-especialista_id');
         return;
     }
     $.ajax({
@@ -63,12 +62,6 @@ $('#citas-especialista_id').on('change', function (ev) {
 });
 EOT;
 $this->registerJs($js);
-$js = <<<EOT
-$('#citas-create').yiiActiveForm('validateAttribute', 'citas-especialista_id');
-$('#citas-especialidad_id').trigger('change');
-
-EOT;
-$this->registerJs($js, View::POS_LOAD);
 ?>
 <div class="citas-create">
 

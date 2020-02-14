@@ -34,7 +34,7 @@ class Citas extends \yii\db\ActiveRecord
     {
         return [
             [['!usuario_id', 'especialidad_id', 'especialista_id', 'instante'], 'required'],
-            [['usuario_id', 'especialista_id'], 'default', 'value' => null],
+            [['usuario_id'], 'default', 'value' => null],
             [['usuario_id', 'especialista_id'], 'integer'],
             [['instante'], 'safe'],
             [['especialidad_id'], 'exist', 'skipOnError' => true, 'targetClass' => Especialidades::class, 'targetAttribute' => ['especialidad_id' => 'id']],
